@@ -3,6 +3,7 @@ package com.ronney.portfolioapi.service;
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.entity.Project;
+import com.ronney.portfolioapi.exception.ResourceNotFoundException;
 import com.ronney.portfolioapi.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class ProjectService {
 
     private Project findEntityById(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
     }
 
     public ProjectResponseDTO create(ProjectRequestDTO dto) {
