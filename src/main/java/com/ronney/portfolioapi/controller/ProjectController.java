@@ -3,10 +3,12 @@ package com.ronney.portfolioapi.controller;
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.entity.Project;
+import com.ronney.portfolioapi.service.FileUploadService;
 import com.ronney.portfolioapi.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectService service;
+    private final FileUploadService fileUploadService;
 
     @GetMapping
     public ResponseEntity<List<ProjectResponseDTO>> findAll() {
@@ -27,8 +30,28 @@ public class ProjectController {
         return ResponseEntity.ok(service.findById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<ProjectResponseDTO> create(@RequestBody ProjectRequestDTO dto) {
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<ProjectResponseDTO> create(
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam(required = false)MultipartFile image,
+            @RequestParam String githubUrl,
+            @RequestParam String demoUrl
+    ) {
+        String imageUrl = null;
+
+        if (image != null && !image.isEmpty()) {
+            imageUrl = fileUploadService.uploadFile(image);
+        }
+
+        ProjectRequestDTO dto = new ProjectRequestDTO();
+
+        dto.setTitle(title);
+        dto.setDescription(description);
+        dto.setImageURL(imageUrl);
+        dto.setGithubUrl(githubUrl);
+        dto.setDemoUrl(demoUrl);
+
         return ResponseEntity.ok(service.create(dto));
     }
 
