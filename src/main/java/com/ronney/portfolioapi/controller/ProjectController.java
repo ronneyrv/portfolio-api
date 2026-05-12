@@ -5,6 +5,7 @@ import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.entity.Project;
 import com.ronney.portfolioapi.service.FileUploadService;
 import com.ronney.portfolioapi.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class ProjectController {
     private final ProjectService service;
     private final FileUploadService fileUploadService;
 
+    @Operation(summary = "List all projects")
     @GetMapping
     public ResponseEntity<List<ProjectResponseDTO>> findAll() {
         return ResponseEntity.ok(service.findAll());
@@ -30,6 +32,7 @@ public class ProjectController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @Operation(summary = "Create a new project")
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ProjectResponseDTO> create(
             @RequestParam String title,
