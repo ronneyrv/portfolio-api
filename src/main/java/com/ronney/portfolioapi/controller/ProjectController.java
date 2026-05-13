@@ -8,12 +8,13 @@ import com.ronney.portfolioapi.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
@@ -22,14 +23,40 @@ public class ProjectController {
     private final ProjectService service;
     private final FileUploadService fileUploadService;
 
-    @Operation(summary = "List all projects")
+    @Operation(summary = "List all projects with pagination")
     @GetMapping
-    public ResponseEntity<List<ProjectResponseDTO>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<ProjectResponseDTO>> findAll(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt"
+            )
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(service.findAll(pageable));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProjectResponseDTO>> search(
+            @RequestParam String title,
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt"
+            )
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                service.searchByTitle(title, pageable)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDTO> findById(@PathVariable Integer id) {
+    public ResponseEntity<ProjectResponseDTO> findById(
+            @PathVariable Integer id
+    ) {
         return ResponseEntity.ok(service.findById(id));
     }
 
