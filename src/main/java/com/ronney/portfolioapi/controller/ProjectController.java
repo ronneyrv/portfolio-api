@@ -6,6 +6,7 @@ import com.ronney.portfolioapi.entity.Project;
 import com.ronney.portfolioapi.service.FileUploadService;
 import com.ronney.portfolioapi.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,28 +33,17 @@ public class ProjectController {
         return ResponseEntity.ok(service.findById(id));
     }
 
-    @Operation(summary = "Create a new project")
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ProjectResponseDTO> create(
-            @RequestParam String title,
-            @RequestParam String description,
-            @RequestParam(required = false)MultipartFile image,
-            @RequestParam String githubUrl,
-            @RequestParam String demoUrl
+            @Valid @ModelAttribute ProjectRequestDTO dto
     ) {
         String imageUrl = null;
 
-        if (image != null && !image.isEmpty()) {
-            imageUrl = fileUploadService.uploadFile(image);
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            imageUrl = fileUploadService.uploadFile(dto.getImage());
         }
 
-        ProjectRequestDTO dto = new ProjectRequestDTO();
-
-        dto.setTitle(title);
-        dto.setDescription(description);
-        dto.setImageURL(imageUrl);
-        dto.setGithubUrl(githubUrl);
-        dto.setDemoUrl(demoUrl);
+        dto.setImageUrl(imageUrl);
 
         return ResponseEntity.ok(service.create(dto));
     }

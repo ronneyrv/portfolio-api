@@ -38,7 +38,7 @@ public class ProjectService {
         Project project = Project.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
-                .imageUrl(dto.getImageURL())
+                .imageUrl(dto.getImageUrl())
                 .githubUrl(dto.getGithubUrl())
                 .demoUrl(dto.getDemoUrl())
                 .createdAt(LocalDateTime.now())
