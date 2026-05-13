@@ -6,10 +6,11 @@ import com.ronney.portfolioapi.entity.Project;
 import com.ronney.portfolioapi.exception.ResourceNotFoundException;
 import com.ronney.portfolioapi.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +18,13 @@ public class ProjectService {
 
     private final ProjectRepository repository;
 
-    public List<ProjectResponseDTO> findAll() {
-        return repository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public Page<ProjectResponseDTO> findAll(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(this::mapToResponse);
+    }
+    public Page<ProjectResponseDTO> searchByTitle(String title, Pageable pageable) {
+        return repository.findByTitleContainingIgnoreCase(title, pageable)
+                .map(this::mapToResponse);
     }
 
     public ProjectResponseDTO findById(Integer id) {
