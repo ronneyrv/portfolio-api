@@ -20,5 +20,7 @@ public class ProjectResponseDTO {
 
     private String demoUrl;
 
+    private Integer displayOrder;
+
     private LocalDateTime createdAt;
 }

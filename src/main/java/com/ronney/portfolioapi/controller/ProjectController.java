@@ -28,7 +28,7 @@ public class ProjectController {
             @PageableDefault(
                     page = 0,
                     size = 10,
-                    sort = "createdAt"
+                    sort = "displayOrder"
             )
             Pageable pageable
     ) {
@@ -42,7 +42,7 @@ public class ProjectController {
             @PageableDefault(
                     page = 0,
                     size = 10,
-                    sort = "createdAt"
+                    sort = "displayOrder"
             )
             Pageable pageable
     ) {

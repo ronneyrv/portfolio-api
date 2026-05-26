@@ -29,5 +29,8 @@ public class Project {
 
     private String demoUrl;
 
+    @Column(nullable = false)
+    private Integer displayOrder;
+
     private LocalDateTime createdAt;
 }
