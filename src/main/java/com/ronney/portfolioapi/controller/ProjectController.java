@@ -2,7 +2,6 @@ package com.ronney.portfolioapi.controller;
 
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
-import com.ronney.portfolioapi.entity.Project;
 import com.ronney.portfolioapi.service.FileUploadService;
 import com.ronney.portfolioapi.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,9 +73,16 @@ public class ProjectController {
         return ResponseEntity.ok(service.create(dto));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Project> update(@PathVariable Integer id, @RequestBody Project project) {
-        return ResponseEntity.ok(service.update(id, project));
+    @PutMapping(value="/{id}", consumes="multipart/form-data")
+    public ResponseEntity<ProjectResponseDTO> update(
+            @PathVariable Integer id,
+            @ModelAttribute ProjectRequestDTO dto
+    ) {
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            String imageUrl = fileUploadService.uploadFile(dto.getImage());
+            dto.setImageUrl(imageUrl);
+        }
+        return ResponseEntity.ok(service.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
