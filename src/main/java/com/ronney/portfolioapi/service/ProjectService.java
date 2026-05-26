@@ -7,7 +7,9 @@ import com.ronney.portfolioapi.exception.ResourceNotFoundException;
 import com.ronney.portfolioapi.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,7 +21,13 @@ public class ProjectService {
     private final ProjectRepository repository;
 
     public Page<ProjectResponseDTO> findAll(Pageable pageable) {
-        return repository.findAll(pageable)
+        Pageable orderedPageable =
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        Sort.by("displayOrder")
+                );
+        return repository.findAll(orderedPageable)
                 .map(this::mapToResponse);
     }
     public Page<ProjectResponseDTO> searchByTitle(String title, Pageable pageable) {
@@ -44,6 +52,7 @@ public class ProjectService {
                 .imageUrl(dto.getImageUrl())
                 .githubUrl(dto.getGithubUrl())
                 .demoUrl(dto.getDemoUrl())
+                .displayOrder(dto.getDisplayOrder())
                 .createdAt(LocalDateTime.now())
                 .build();
         Project savedProject = repository.save(project);
@@ -60,6 +69,7 @@ public class ProjectService {
                 .imageUrl(project.getImageUrl())
                 .githubUrl(project.getGithubUrl())
                 .demoUrl(project.getDemoUrl())
+                .displayOrder(project.getDisplayOrder())
                 .createdAt(project.getCreatedAt())
                 .build();
     }
@@ -71,11 +81,13 @@ public class ProjectService {
         existingProject.setDescription(dto.getDescription());
         existingProject.setGithubUrl(dto.getGithubUrl());
         existingProject.setDemoUrl(dto.getDemoUrl());
+        existingProject.setDisplayOrder(dto.getDisplayOrder());
 
-    if (dto.getImageUrl() != null) {
-        existingProject.setImageUrl(dto.getImageUrl());
-    }
-    Project updatedProject = repository.save(existingProject);
+        if (dto.getImageUrl() != null) {
+            existingProject.setImageUrl(dto.getImageUrl());
+        }
+
+        Project updatedProject = repository.save(existingProject);
 
         return mapToResponse(updatedProject);
     }

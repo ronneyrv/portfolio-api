@@ -21,4 +21,6 @@ public class ProjectRequestDTO {
     private String githubUrl;
 
     private String demoUrl;
+
+    private Integer displayOrder;
 }
