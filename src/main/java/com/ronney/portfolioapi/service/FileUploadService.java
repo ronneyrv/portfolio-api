@@ -1,34 +1,32 @@
 package com.ronney.portfolioapi.service;
 
+
+import com.cloudinary.Cloudinary;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class FileUploadService {
-    private final String UPLOAD_DIR = "uploads/";
+    private final Cloudinary cloudinary;
 
     public String uploadFile(MultipartFile file) {
         try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String fileName = file.getOriginalFilename();
-
-            Path filePath = uploadPath.resolve(fileName);
-
-            Files.copy(file.getInputStream(), filePath);
-
-            return "/uploads/" + fileName;
+            Map uploadResult = cloudinary
+                    .uploader()
+                    .upload(
+                            file.getBytes(),
+                            Map.of()
+                    );
+            return uploadResult
+                    .get("secure_url")
+                    .toString();
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao salvar imagem");
+            throw new RuntimeException("Erro ao salvar imagem. erro: " + e.getMessage());
         }
     }
 }
