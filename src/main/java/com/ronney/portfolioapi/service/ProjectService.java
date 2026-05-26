@@ -64,16 +64,20 @@ public class ProjectService {
                 .build();
     }
 
-    public Project update(Integer id, Project project) {
+    public ProjectResponseDTO update(Integer id, ProjectRequestDTO dto) {
         Project existingProject = findEntityById(id);
 
-        existingProject.setTitle(project.getTitle());
-        existingProject.setDescription(project.getDescription());
-        existingProject.setImageUrl(project.getImageUrl());
-        existingProject.setGithubUrl(project.getGithubUrl());
-        existingProject.setDemoUrl(project.getDemoUrl());
+        existingProject.setTitle(dto.getTitle());
+        existingProject.setDescription(dto.getDescription());
+        existingProject.setGithubUrl(dto.getGithubUrl());
+        existingProject.setDemoUrl(dto.getDemoUrl());
 
-        return repository.save(existingProject);
+    if (dto.getImageUrl() != null) {
+        existingProject.setImageUrl(dto.getImageUrl());
+    }
+    Project updatedProject = repository.save(existingProject);
+
+        return mapToResponse(updatedProject);
     }
 
     public void delete(Integer id) {
