@@ -16,7 +16,7 @@ public class CorsConfig {
                     CorsRegistry registry
             ) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins("http://localhost:5173","https://portfolio-web-chi-blush.vercel.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*");
             }
