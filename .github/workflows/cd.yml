@@ -79,9 +79,9 @@ jobs:
 
             echo "Rolling back to: $PREVIOUS_IMAGE"
 
-            docker rm -f "$CONTAINER" 2>/dev/null || true
+            sudo docker rm -f "$CONTAINER" 2>/dev/null || true
 
-            docker run -d \
+            sudo docker run -d \
               --name "$CONTAINER" \
               --restart unless-stopped \
               --env-file /opt/portfolio-api/.env \
@@ -104,8 +104,8 @@ jobs:
             return 1
           }
 
-          if docker inspect "$CONTAINER" >/dev/null 2>&1; then
-            PREVIOUS_IMAGE="$(docker inspect --format '{{.Config.Image}}' "$CONTAINER")"
+          if sudo docker inspect "$CONTAINER" >/dev/null 2>&1; then
+            PREVIOUS_IMAGE="$(sudo docker inspect --format '{{.Config.Image}}' "$CONTAINER")"
             echo "Previous image: $PREVIOUS_IMAGE"
           else
             PREVIOUS_IMAGE=""
@@ -113,16 +113,16 @@ jobs:
           fi
 
           echo "Pulling new image: $IMAGE"
-          docker pull "$IMAGE"
+          sudo docker pull "$IMAGE"
 
-          if docker inspect "$CONTAINER" >/dev/null 2>&1; then
-            docker stop "$CONTAINER"
-            docker rm "$CONTAINER"
+          if sudo docker inspect "$CONTAINER" >/dev/null 2>&1; then
+            sudo docker stop "$CONTAINER"
+            sudo docker rm "$CONTAINER"
           fi
 
           echo "Starting new Portfolio API container."
 
-          if ! docker run -d \
+          if ! sudo docker run -d \
             --name "$CONTAINER" \
             --restart unless-stopped \
             --env-file /opt/portfolio-api/.env \
@@ -135,19 +135,19 @@ jobs:
             exit 1
           fi
 
-          for i in $(seq 1 30); do
+          for i in $(seq 1 48); do
             if curl -fsS --max-time 5 \
               http://127.0.0.1:8081/actuator/health > /dev/null; then
               echo "Portfolio API is healthy."
               exit 0
             fi
 
-            echo "Waiting for Portfolio API to become healthy... attempt $i/30"
+            echo "Waiting for Portfolio API to become healthy... attempt $i/48"
             sleep 5
           done
 
           echo "New Portfolio API version failed health check."
-          docker logs --tail 100 "$CONTAINER" || true
+          sudo docker logs --tail 100 "$CONTAINER" || true
 
           if rollback; then
             echo "Previous Portfolio API version restored."
