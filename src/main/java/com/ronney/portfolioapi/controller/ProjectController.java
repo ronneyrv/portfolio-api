@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/projects")
 @RequiredArgsConstructor
 public class ProjectController {
+
     private final ProjectService service;
     private final FileUploadService fileUploadService;
 
@@ -62,31 +63,36 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> create(
             @Valid @ModelAttribute ProjectRequestDTO dto
     ) {
-        String imageUrl = null;
+        String coverImageUrl = null;
 
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
-            imageUrl = fileUploadService.uploadFile(dto.getImage());
+            coverImageUrl = fileUploadService.uploadFile(dto.getImage());
         }
 
-        dto.setImageUrl(imageUrl);
+        dto.setCoverImageUrl(coverImageUrl);
 
         return ResponseEntity.ok(service.create(dto));
     }
 
-    @PutMapping(value="/{id}", consumes="multipart/form-data")
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<ProjectResponseDTO> update(
             @PathVariable Integer id,
-            @ModelAttribute ProjectRequestDTO dto
+            @Valid @ModelAttribute ProjectRequestDTO dto
     ) {
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
-            String imageUrl = fileUploadService.uploadFile(dto.getImage());
-            dto.setImageUrl(imageUrl);
+            String coverImageUrl =
+                    fileUploadService.uploadFile(dto.getImage());
+
+            dto.setCoverImageUrl(coverImageUrl);
         }
+
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(
+            @PathVariable Integer id
+    ) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

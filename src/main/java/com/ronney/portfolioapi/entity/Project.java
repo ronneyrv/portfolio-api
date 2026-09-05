@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Project {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -20,10 +21,16 @@ public class Project {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false, unique = true)
+    private String slug;
+
+    @Column(nullable = false, length = 1000)
+    private String shortDescription;
+
     @Column(length = 5000)
     private String description;
 
-    private String imageUrl;
+    private String coverImageUrl;
 
     private String githubUrl;
 
