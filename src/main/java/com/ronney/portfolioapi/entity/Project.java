@@ -23,7 +23,7 @@ public class Project {
     @Column(length = 5000)
     private String description;
 
-    private String imageUrl;
+    private String coverImageUrl;
 
     private String githubUrl;
 

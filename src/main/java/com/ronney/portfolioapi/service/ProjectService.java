@@ -49,7 +49,7 @@ public class ProjectService {
         Project project = Project.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
-                .imageUrl(dto.getImageUrl())
+                .coverImageUrl(dto.getImageUrl())
                 .githubUrl(dto.getGithubUrl())
                 .demoUrl(dto.getDemoUrl())
                 .displayOrder(dto.getDisplayOrder())
@@ -66,7 +66,7 @@ public class ProjectService {
                 .id(project.getId())
                 .title(project.getTitle())
                 .description(project.getDescription())
-                .imageUrl(project.getImageUrl())
+                .imageUrl(project.getCoverImageUrl())
                 .githubUrl(project.getGithubUrl())
                 .demoUrl(project.getDemoUrl())
                 .displayOrder(project.getDisplayOrder())
@@ -84,7 +84,7 @@ public class ProjectService {
         existingProject.setDisplayOrder(dto.getDisplayOrder());
 
         if (dto.getImageUrl() != null) {
-            existingProject.setImageUrl(dto.getImageUrl());
+            existingProject.setCoverImageUrl(dto.getImageUrl());
         }
 
         Project updatedProject = repository.save(existingProject);
