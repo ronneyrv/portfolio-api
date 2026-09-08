@@ -43,7 +43,15 @@ class ProjectControllerTest {
                 ProjectResponseDTO.builder()
                         .id(1)
                         .title("Portfolio API")
+                        .slug("api-portfolio")
+                        .shortDescription(
+                                "API REST desenvolvida com Spring Boot para gerenciamento de projetos do portfólio."
+                        )
                         .description("Backend")
+                        .coverImageUrl("https://example.com/portfolio-api.jpg")
+                        .githubUrl("https://github.com/ronneyrv/portfolio-api")
+                        .demoUrl("https://portfolio-api.example.com")
+                        .displayOrder(20)
                         .createdAt(LocalDateTime.now())
                         .build();
 
@@ -64,6 +72,32 @@ class ProjectControllerTest {
                 .andExpect(
                         jsonPath("$.content[0].title")
                                 .value("Portfolio API")
+                )
+                .andExpect(
+                        jsonPath("$.content[0].slug")
+                                .value("api-portfolio")
+        )
+                .andExpect(
+                        jsonPath("$.content[0].shortDescription")
+                                .value(
+                                        "API REST desenvolvida com Spring Boot para gerenciamento de projetos do portfólio."
+                                )
+                )
+                .andExpect(
+                        jsonPath("$.content[0].coverImageUrl")
+                                .value("https://example.com/portfolio-api.jpg")
+                )
+                .andExpect(
+                        jsonPath("$.content[0].githubUrl")
+                                .value("https://github.com/ronneyrv/portfolio-api")
+                )
+                .andExpect(
+                        jsonPath("$.content[0].demoUrl")
+                                .value("https://portfolio-api.example.com")
+                )
+                .andExpect(
+                        jsonPath("$.content[0].displayOrder")
+                                .value(20)
                 );
     }
 }
