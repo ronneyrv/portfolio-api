@@ -27,10 +27,15 @@ public class ProjectService {
                         pageable.getPageSize(),
                         Sort.by("displayOrder")
                 );
+
         return repository.findAll(orderedPageable)
                 .map(this::mapToResponse);
     }
-    public Page<ProjectResponseDTO> searchByTitle(String title, Pageable pageable) {
+
+    public Page<ProjectResponseDTO> searchByTitle(
+            String title,
+            Pageable pageable
+    ) {
         return repository.findByTitleContainingIgnoreCase(title, pageable)
                 .map(this::mapToResponse);
     }
@@ -42,31 +47,39 @@ public class ProjectService {
 
     private Project findEntityById(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Projeto não encontrado"
+                        )
+                );
     }
 
     public ProjectResponseDTO create(ProjectRequestDTO dto) {
         Project project = Project.builder()
                 .title(dto.getTitle())
+                .slug(dto.getSlug())
+                .shortDescription(dto.getShortDescription())
                 .description(dto.getDescription())
-                .imageUrl(dto.getImageUrl())
+                .coverImageUrl(dto.getCoverImageUrl())
                 .githubUrl(dto.getGithubUrl())
                 .demoUrl(dto.getDemoUrl())
                 .displayOrder(dto.getDisplayOrder())
                 .createdAt(LocalDateTime.now())
                 .build();
+
         Project savedProject = repository.save(project);
 
         return mapToResponse(savedProject);
     }
 
     private ProjectResponseDTO mapToResponse(Project project) {
-
         return ProjectResponseDTO.builder()
                 .id(project.getId())
                 .title(project.getTitle())
+                .slug(project.getSlug())
+                .shortDescription(project.getShortDescription())
                 .description(project.getDescription())
-                .imageUrl(project.getImageUrl())
+                .coverImageUrl(project.getCoverImageUrl())
                 .githubUrl(project.getGithubUrl())
                 .demoUrl(project.getDemoUrl())
                 .displayOrder(project.getDisplayOrder())
@@ -74,17 +87,22 @@ public class ProjectService {
                 .build();
     }
 
-    public ProjectResponseDTO update(Integer id, ProjectRequestDTO dto) {
+    public ProjectResponseDTO update(
+            Integer id,
+            ProjectRequestDTO dto
+    ) {
         Project existingProject = findEntityById(id);
 
         existingProject.setTitle(dto.getTitle());
+        existingProject.setSlug(dto.getSlug());
+        existingProject.setShortDescription(dto.getShortDescription());
         existingProject.setDescription(dto.getDescription());
         existingProject.setGithubUrl(dto.getGithubUrl());
         existingProject.setDemoUrl(dto.getDemoUrl());
         existingProject.setDisplayOrder(dto.getDisplayOrder());
 
-        if (dto.getImageUrl() != null) {
-            existingProject.setImageUrl(dto.getImageUrl());
+        if (dto.getCoverImageUrl() != null) {
+            existingProject.setCoverImageUrl(dto.getCoverImageUrl());
         }
 
         Project updatedProject = repository.save(existingProject);
@@ -94,7 +112,17 @@ public class ProjectService {
 
     public void delete(Integer id) {
         Project project = findEntityById(id);
-
         repository.delete(project);
+    }
+
+    public ProjectResponseDTO findBySlug(String slug) {
+        Project project = repository.findBySlug(slug)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Projeto não encontrado"
+                        )
+                );
+
+        return mapToResponse(project);
     }
 }

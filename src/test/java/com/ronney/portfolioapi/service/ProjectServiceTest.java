@@ -3,6 +3,7 @@ package com.ronney.portfolioapi.service;
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.entity.Project;
+import com.ronney.portfolioapi.exception.ResourceNotFoundException;
 import com.ronney.portfolioapi.repository.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,13 @@ public class ProjectServiceTest {
         project = Project.builder()
                 .id(1)
                 .title("Portfolio API")
+                .slug("api-portfolio")
+                .shortDescription("API REST desenvolvida com Spring Boot para gerenciamento de projetos do portfólio.")
                 .description("Backend project")
+                .coverImageUrl("https://example.com/portfolio-api.jpg")
+                .githubUrl("https://github.com/ronneyrv/portfolio-api")
+                .demoUrl("https://portfolio-api.example.com")
+                .displayOrder(20)
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -41,7 +48,15 @@ public class ProjectServiceTest {
         ProjectRequestDTO dto = new ProjectRequestDTO();
 
         dto.setTitle("Portfolio API");
+        dto.setSlug("api-portfolio");
+        dto.setShortDescription(
+                "API REST desenvolvida com Spring Boot para gerenciamento de projetos do portfólio."
+        );
         dto.setDescription("Backend project");
+        dto.setCoverImageUrl("https://example.com/portfolio-api.jpg");
+        dto.setGithubUrl("https://github.com/ronneyrv/portfolio-api");
+        dto.setDemoUrl("https://portfolio-api.example.com");
+        dto.setDisplayOrder(20);
 
         when(repository.save(any(Project.class)))
                 .thenReturn(project);
@@ -50,8 +65,66 @@ public class ProjectServiceTest {
 
         assertNotNull(response);
         assertEquals("Portfolio API", response.getTitle());
+        assertEquals("api-portfolio", response.getSlug());
+        assertEquals(
+                "API REST desenvolvida com Spring Boot para gerenciamento de projetos do portfólio.",
+                response.getShortDescription()
+        );
+        assertEquals("Backend project", response.getDescription());
+        assertEquals(
+                "https://example.com/portfolio-api.jpg",
+                response.getCoverImageUrl()
+        );
+        assertEquals(
+                "https://github.com/ronneyrv/portfolio-api",
+                response.getGithubUrl()
+        );
+        assertEquals(
+                "https://portfolio-api.example.com",
+                response.getDemoUrl()
+        );
+        assertEquals(20, response.getDisplayOrder());
 
         verify(repository, times(1))
                 .save(any(Project.class));
+    }
+
+    @Test
+    void shouldFindProjectBySlug() {
+        when(repository.findBySlug("api-portfolio"))
+                .thenReturn(java.util.Optional.of(project));
+
+        ProjectResponseDTO response =
+                service.findBySlug("api-portfolio");
+
+        assertNotNull(response);
+        assertEquals(1, response.getId());
+        assertEquals("Portfolio API", response.getTitle());
+        assertEquals("api-portfolio", response.getSlug());
+        assertEquals(
+                "API REST desenvolvida com Spring Boot para gerenciamento de projetos do portfólio.",
+                response.getShortDescription()
+        );
+        assertEquals(
+                "https://example.com/portfolio-api.jpg",
+                response.getCoverImageUrl()
+        );
+
+        verify(repository, times(1))
+                .findBySlug("api-portfolio");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenProjectSlugDoesNotExist() {
+        when(repository.findBySlug("non-existent"))
+                .thenReturn(java.util.Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.findBySlug("non-existent")
+        );
+
+        verify(repository, times(1))
+                .findBySlug("non-existent");
     }
 }
