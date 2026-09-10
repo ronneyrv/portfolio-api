@@ -114,4 +114,15 @@ public class ProjectService {
         Project project = findEntityById(id);
         repository.delete(project);
     }
+
+    public ProjectResponseDTO findBySlug(String slug) {
+        Project project = repository.findBySlug(slug)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Projeto não encontrado"
+                        )
+                );
+
+        return mapToResponse(project);
+    }
 }

@@ -52,11 +52,11 @@ public class ProjectController {
         );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDTO> findById(
-            @PathVariable Integer id
+    @GetMapping("/{slug}")
+    public ResponseEntity<ProjectResponseDTO> findBySlug(
+            @PathVariable String slug
     ) {
-        return ResponseEntity.ok(service.findById(id));
+        return ResponseEntity.ok(service.findBySlug(slug));
     }
 
     @PostMapping(consumes = "multipart/form-data")

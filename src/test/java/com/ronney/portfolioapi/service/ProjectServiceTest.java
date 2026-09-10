@@ -3,6 +3,7 @@ package com.ronney.portfolioapi.service;
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.entity.Project;
+import com.ronney.portfolioapi.exception.ResourceNotFoundException;
 import com.ronney.portfolioapi.repository.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,5 +87,44 @@ public class ProjectServiceTest {
 
         verify(repository, times(1))
                 .save(any(Project.class));
+    }
+
+    @Test
+    void shouldFindProjectBySlug() {
+        when(repository.findBySlug("api-portfolio"))
+                .thenReturn(java.util.Optional.of(project));
+
+        ProjectResponseDTO response =
+                service.findBySlug("api-portfolio");
+
+        assertNotNull(response);
+        assertEquals(1, response.getId());
+        assertEquals("Portfolio API", response.getTitle());
+        assertEquals("api-portfolio", response.getSlug());
+        assertEquals(
+                "API REST desenvolvida com Spring Boot para gerenciamento de projetos do portfólio.",
+                response.getShortDescription()
+        );
+        assertEquals(
+                "https://example.com/portfolio-api.jpg",
+                response.getCoverImageUrl()
+        );
+
+        verify(repository, times(1))
+                .findBySlug("api-portfolio");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenProjectSlugDoesNotExist() {
+        when(repository.findBySlug("non-existent"))
+                .thenReturn(java.util.Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.findBySlug("non-existent")
+        );
+
+        verify(repository, times(1))
+                .findBySlug("non-existent");
     }
 }
