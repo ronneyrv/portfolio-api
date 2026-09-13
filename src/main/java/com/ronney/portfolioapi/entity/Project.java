@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "projects")
@@ -38,6 +40,14 @@ public class Project {
 
     @Column(nullable = false)
     private Integer displayOrder;
+
+    @OneToMany(
+            mappedBy = "project",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("displayOrder ASC")
+    private List<ProjectImage> images = new ArrayList<>();
 
     private LocalDateTime createdAt;
 }

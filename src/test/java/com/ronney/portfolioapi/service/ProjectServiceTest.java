@@ -1,9 +1,12 @@
 package com.ronney.portfolioapi.service;
 
+import com.ronney.portfolioapi.dto.ProjectDetailsResponseDTO;
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.entity.Project;
+import com.ronney.portfolioapi.entity.ProjectImage;
 import com.ronney.portfolioapi.exception.ResourceNotFoundException;
+import com.ronney.portfolioapi.repository.ProjectImageRepository;
 import com.ronney.portfolioapi.repository.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +24,9 @@ import static org.mockito.Mockito.*;
 public class ProjectServiceTest {
     @Mock
     private ProjectRepository repository;
+
+    @Mock
+    private ProjectImageRepository imageRepository;
 
     @InjectMocks
     private ProjectService service;
@@ -94,7 +100,26 @@ public class ProjectServiceTest {
         when(repository.findBySlug("api-portfolio"))
                 .thenReturn(java.util.Optional.of(project));
 
-        ProjectResponseDTO response =
+        ProjectImage firstImage = ProjectImage.builder()
+                .id(1)
+                .project(project)
+                .imageUrl("https://example.com/image-1.jpg")
+                .displayOrder(1)
+                .altText("First screenshot")
+                .build();
+
+        ProjectImage secondImage = ProjectImage.builder()
+                .id(2)
+                .project(project)
+                .imageUrl("https://example.com/image-2.jpg")
+                .displayOrder(2)
+                .altText("Second screenshot")
+                .build();
+
+        when(imageRepository.findByProjectIdOrderByDisplayOrderAsc(1))
+                .thenReturn(java.util.List.of(firstImage, secondImage));
+
+        ProjectDetailsResponseDTO response =
                 service.findBySlug("api-portfolio");
 
         assertNotNull(response);
@@ -109,6 +134,25 @@ public class ProjectServiceTest {
                 "https://example.com/portfolio-api.jpg",
                 response.getCoverImageUrl()
         );
+        assertNotNull(response.getImages());
+        assertEquals(2, response.getImages().size());
+
+        assertEquals(1, response.getImages().get(0).getId());
+        assertEquals(1, response.getImages().get(0).getDisplayOrder());
+        assertEquals(
+                "First screenshot",
+                response.getImages().get(0).getAltText()
+        );
+
+        assertEquals(2, response.getImages().get(1).getId());
+        assertEquals(2, response.getImages().get(1).getDisplayOrder());
+        assertEquals(
+                "Second screenshot",
+                response.getImages().get(1).getAltText()
+        );
+
+        verify(imageRepository, times(1))
+                .findByProjectIdOrderByDisplayOrderAsc(1);
 
         verify(repository, times(1))
                 .findBySlug("api-portfolio");

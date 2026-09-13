@@ -1,5 +1,7 @@
 package com.ronney.portfolioapi.controller;
 
+import com.ronney.portfolioapi.dto.ProjectDetailsResponseDTO;
+import com.ronney.portfolioapi.dto.ProjectImageResponseDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.exception.ResourceNotFoundException;
 import com.ronney.portfolioapi.service.FileUploadService;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -102,8 +105,8 @@ class ProjectControllerTest {
     @Test
     void shouldReturnProjectBySlug() throws Exception {
 
-        ProjectResponseDTO dto =
-                ProjectResponseDTO.builder()
+        ProjectDetailsResponseDTO dto =
+                ProjectDetailsResponseDTO.builder()
                         .id(1)
                         .title("Portfolio API")
                         .slug("api-portfolio")
@@ -116,6 +119,22 @@ class ProjectControllerTest {
                         .demoUrl("https://portfolio-api.example.com")
                         .displayOrder(20)
                         .createdAt(LocalDateTime.now())
+                        .images(
+                                List.of(
+                                        ProjectImageResponseDTO.builder()
+                                                .id(1)
+                                                .imageUrl("https://example.com/image-1.jpg")
+                                                .displayOrder(1)
+                                                .altText("Project screenshot")
+                                                .build(),
+                                        ProjectImageResponseDTO.builder()
+                                                .id(2)
+                                                .imageUrl("https://example.com/image-2.jpg")
+                                                .displayOrder(2)
+                                                .altText("Another project screenshot")
+                                                .build()
+                                )
+                        )
                         .build();
 
         when(service.findBySlug("api-portfolio"))
@@ -156,6 +175,26 @@ class ProjectControllerTest {
                 .andExpect(
                         jsonPath("$.displayOrder")
                                 .value(20)
+                )
+                .andExpect(
+                        jsonPath("$.images[0].id")
+                                .value(1)
+                )
+                .andExpect(
+                        jsonPath("$.images[0].displayOrder")
+                                .value(1)
+                )
+                .andExpect(
+                        jsonPath("$.images[0].altText")
+                                .value("Project screenshot")
+                )
+                .andExpect(
+                        jsonPath("$.images[1].id")
+                                .value(2)
+                )
+                .andExpect(
+                        jsonPath("$.images[1].displayOrder")
+                                .value(2)
                 );
     }
 

@@ -1,9 +1,13 @@
 package com.ronney.portfolioapi.service;
 
+import com.ronney.portfolioapi.dto.ProjectDetailsResponseDTO;
+import com.ronney.portfolioapi.dto.ProjectImageResponseDTO;
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.entity.Project;
+import com.ronney.portfolioapi.entity.ProjectImage;
 import com.ronney.portfolioapi.exception.ResourceNotFoundException;
+import com.ronney.portfolioapi.repository.ProjectImageRepository;
 import com.ronney.portfolioapi.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +23,7 @@ import java.time.LocalDateTime;
 public class ProjectService {
 
     private final ProjectRepository repository;
+    private final ProjectImageRepository imageRepository;
 
     public Page<ProjectResponseDTO> findAll(Pageable pageable) {
         Pageable orderedPageable =
@@ -115,7 +120,18 @@ public class ProjectService {
         repository.delete(project);
     }
 
-    public ProjectResponseDTO findBySlug(String slug) {
+    private ProjectImageResponseDTO mapToImageResponse(
+            ProjectImage image
+    ) {
+        return ProjectImageResponseDTO.builder()
+                .id(image.getId())
+                .imageUrl(image.getImageUrl())
+                .displayOrder(image.getDisplayOrder())
+                .altText(image.getAltText())
+                .build();
+    }
+
+    public ProjectDetailsResponseDTO findBySlug(String slug) {
         Project project = repository.findBySlug(slug)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
@@ -123,6 +139,26 @@ public class ProjectService {
                         )
                 );
 
-        return mapToResponse(project);
+        return ProjectDetailsResponseDTO.builder()
+                .id(project.getId())
+                .title(project.getTitle())
+                .slug(project.getSlug())
+                .shortDescription(project.getShortDescription())
+                .description(project.getDescription())
+                .coverImageUrl(project.getCoverImageUrl())
+                .githubUrl(project.getGithubUrl())
+                .demoUrl(project.getDemoUrl())
+                .displayOrder(project.getDisplayOrder())
+                .createdAt(project.getCreatedAt())
+                .images(
+                        imageRepository
+                                .findByProjectIdOrderByDisplayOrderAsc(
+                                        project.getId()
+                                )
+                                .stream()
+                                .map(this::mapToImageResponse)
+                                .toList()
+                )
+                .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.ronney.portfolioapi.controller;
 
+import com.ronney.portfolioapi.dto.ProjectDetailsResponseDTO;
 import com.ronney.portfolioapi.dto.ProjectRequestDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.service.FileUploadService;
@@ -53,7 +54,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<ProjectResponseDTO> findBySlug(
+    public ResponseEntity<ProjectDetailsResponseDTO> findBySlug(
             @PathVariable String slug
     ) {
         return ResponseEntity.ok(service.findBySlug(slug));
