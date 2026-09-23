@@ -4,10 +4,13 @@ import com.ronney.portfolioapi.dto.ProjectDetailsResponseDTO;
 import com.ronney.portfolioapi.dto.ProjectImageResponseDTO;
 import com.ronney.portfolioapi.dto.ProjectResponseDTO;
 import com.ronney.portfolioapi.exception.ResourceNotFoundException;
+import com.ronney.portfolioapi.security.CustomUserDetailsService;
+import com.ronney.portfolioapi.security.JwtService;
 import com.ronney.portfolioapi.service.FileUploadService;
 import com.ronney.portfolioapi.service.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProjectController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ProjectControllerTest {
 
     @Autowired
@@ -36,6 +40,12 @@ class ProjectControllerTest {
 
     @MockitoBean
     private FileUploadService fileUploadService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void shouldReturnProjects() throws Exception {
