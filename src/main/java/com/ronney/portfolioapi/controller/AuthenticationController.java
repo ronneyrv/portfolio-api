@@ -33,6 +33,22 @@ public class AuthenticationController {
         return new AuthenticationResponse(token);
     }
 
+    @GetMapping("/me")
+    public UserResponse me(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        String role = userDetails.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(authority -> authority.getAuthority().replace("ROLE_", ""))
+                .orElse(null);
+
+        return new UserResponse(
+                userDetails.getUsername(),
+                role
+        );
+    }
+
     public record AuthenticationRequest(
             String username,
             String password
@@ -41,6 +57,12 @@ public class AuthenticationController {
 
     public record AuthenticationResponse(
             String token
+    ) {
+    }
+
+    public record UserResponse(
+            String username,
+            String role
     ) {
     }
 }
