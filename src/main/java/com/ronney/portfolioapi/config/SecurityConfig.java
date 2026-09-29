@@ -99,6 +99,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
+                                "/ping",
                                 "/health",
                                 "/actuator/health",
                                 "/auth/login",

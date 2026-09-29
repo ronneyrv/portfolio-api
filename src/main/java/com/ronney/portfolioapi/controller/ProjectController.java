@@ -61,7 +61,7 @@ public class ProjectController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<ProjectResponseDTO> findById(
+    public ResponseEntity<ProjectDetailsResponseDTO> findById(
             @PathVariable Integer id
     ) {
         return ResponseEntity.ok(service.findById(id));
