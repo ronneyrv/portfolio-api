@@ -60,6 +60,13 @@ public class ProjectController {
         return ResponseEntity.ok(service.findBySlug(slug));
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ProjectDetailsResponseDTO> findById(
+            @PathVariable Integer id
+    ) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ProjectResponseDTO> create(
             @Valid @ModelAttribute ProjectRequestDTO dto

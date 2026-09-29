@@ -45,9 +45,30 @@ public class ProjectService {
                 .map(this::mapToResponse);
     }
 
-    public ProjectResponseDTO findById(Integer id) {
+    public ProjectDetailsResponseDTO findById(Integer id) {
         Project project = findEntityById(id);
-        return mapToResponse(project);
+
+        return ProjectDetailsResponseDTO.builder()
+                .id(project.getId())
+                .title(project.getTitle())
+                .slug(project.getSlug())
+                .shortDescription(project.getShortDescription())
+                .description(project.getDescription())
+                .coverImageUrl(project.getCoverImageUrl())
+                .githubUrl(project.getGithubUrl())
+                .demoUrl(project.getDemoUrl())
+                .displayOrder(project.getDisplayOrder())
+                .createdAt(project.getCreatedAt())
+                .images(
+                        imageRepository
+                                .findByProjectIdOrderByDisplayOrderAsc(
+                                        project.getId()
+                                )
+                                .stream()
+                                .map(this::mapToImageResponse)
+                                .toList()
+                )
+                .build();
     }
 
     private Project findEntityById(Integer id) {
