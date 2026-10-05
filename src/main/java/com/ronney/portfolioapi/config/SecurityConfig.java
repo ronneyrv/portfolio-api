@@ -54,7 +54,9 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://ronneyrocha.com.br"
+                "https://portfolio-ronney.vercel.app",
+                "https://ronneyrocha.com.br",
+                "https://www.ronneyrocha.com.br"
         ));
 
         configuration.setAllowedMethods(List.of(
